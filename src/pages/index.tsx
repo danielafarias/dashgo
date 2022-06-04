@@ -5,11 +5,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "../components/Form/Input";
 
-type SignInFormData = {
-  email: string;
-  password: string;
-};
-
 const SignInFormSchema = yup.object().shape({
   email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
   password: yup.string().required('Senha obrigatória'),
@@ -21,7 +16,6 @@ const SignIn: NextPage = () => {
   });
 
   const { errors } = formState;
-  console.log(errors);
 
   async function handleSignIn() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
