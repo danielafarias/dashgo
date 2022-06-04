@@ -3,10 +3,23 @@ import {
   Flex,
   Stack,
 } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
 import type { NextPage } from "next";
 import { Input } from "../components/Form/Input";
 
+type SignInFormData = {
+  email: string;
+  password: string;
+}
+
 const SignIn: NextPage = () => {
+  const { register, handleSubmit, getValues, formState } = useForm();
+
+  async function handleSignIn() {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log(getValues());
+  }
+
   return (
     <Flex w="100vw" h="100vh" align="center" justify="center">
       <Flex
@@ -17,12 +30,13 @@ const SignIn: NextPage = () => {
         p="8"
         borderRadius={8}
         flexDir="column"
+        onSubmit={handleSubmit(handleSignIn)}
       >
         <Stack spacing="4">
-         <Input type="email" name="email" label="E-mail" />
-         <Input type="password" name="password" label="Senha" />
+         <Input type="email" label="E-mail" {...register('email')} />
+         <Input type="password" label="Senha" {...register('password')} />
         </Stack>
-        <Button type="submit" mt="6" colorScheme="pink" size="lg">
+        <Button type="submit" mt="6" colorScheme="pink" size="lg" isLoading={formState.isSubmitting}>
           Entrar
         </Button>
       </Flex>
