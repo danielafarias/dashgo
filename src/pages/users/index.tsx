@@ -21,38 +21,15 @@ import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 import { useQuery } from "react-query";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-}
+import { api } from "../../services/api";
+import { useUsers } from "../../services/hooks/useUsers";
+import { useState } from "react";
 
 export default function UserList() {
-  const { data, isLoading, isFetching, error } = useQuery("users", async () => {
-    const response = await fetch("http://localhost:3000/api/users");
-    const data = await response.json();
+  const [page, setPage] = useState(1);
 
-    const users = data.users.map((user: User) => {
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        })
-      }
-    })
-
-    return users;
-  }, {
-    staleTime: 1000 * 5 // 5s
-  });
-
-
+  const { data, isLoading, isFetching, error } = useUsers(page);
+console.log('a' + page)
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
@@ -105,7 +82,7 @@ export default function UserList() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {data.map((user: User) => {
+                  {data?.users.map((user) => {
                     return(
                     <Tr key={user.id}>
                     <Td px={["4", "4", "6"]}>
@@ -125,7 +102,11 @@ export default function UserList() {
                 })}
                 </Tbody>
               </Table>
-              <Pagination />
+              <Pagination 
+                totalCountOfRegisters={data.totalCount}
+                currentPage={page}
+                onPageChange={setPage}
+              />
             </>
           )}
         </Box>
