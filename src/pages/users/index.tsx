@@ -14,6 +14,7 @@ import {
   Thead,
   Tr,
   useBreakpointValue,
+  Link as ChakraLink
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { RiAddLine } from "react-icons/ri";
@@ -24,16 +25,27 @@ import { useQuery } from "react-query";
 import { api } from "../../services/api";
 import { useUsers } from "../../services/hooks/useUsers";
 import { useState } from "react";
+import { queryClient } from "../../services/queryClient";
 
 export default function UserList() {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isFetching, error } = useUsers(page);
-console.log('a' + page)
+
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
+
+  async function handlePrefetchUser(userId: string) {
+    await queryClient.prefetchQuery(['user', userId], async () => {
+      const response = await api.get(`users/${userId}`)
+
+      return response.data;
+    }, {
+      staleTime: 1000 * 60 * 10 // 10 min
+    })
+  }
 
   return (
     <Box>
@@ -90,7 +102,9 @@ console.log('a' + page)
                     </Td>
                     <Td>
                       <Box>
-                        <Text fontWeight="bold">{user.name}</Text>
+                        <ChakraLink color="purple.400" onMouseEnter={() => handlePrefetchUser(user.id)}>
+                          <Text fontWeight="bold">{user.name}</Text>
+                        </ChakraLink>
                         <Text fontSize="sm" color="gray.300">
                           {user.email}
                         </Text>
